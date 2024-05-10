@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: team
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: students
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  node_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: node_app
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: postgres
+      DB_USER: team
+      DB_PASSWORD: password123
+      DB_NAME: students
+
+volumes:
+  postgres_data:
