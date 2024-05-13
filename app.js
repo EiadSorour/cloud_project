@@ -1,3 +1,4 @@
+// Import modules
 const express = require("express");
 const cors = require("cors")
 const { Sequelize, DataTypes } = require("sequelize")
@@ -6,6 +7,7 @@ const app = express();
 app.use(express.static("./frontend"))
 app.use(cors())
 
+// Prepare students data as an array
 const studentsData = [
     {
         ID: 2203176,
@@ -44,11 +46,13 @@ const studentsData = [
     },
 ]
 
+// Initialize sequelize orm with required parameters
 const sequelize = new Sequelize('students', 'team', 'password123', {
     host: 'postgres',
     dialect: 'postgres'
 });
 
+// Initial "Students" table model ( Schema )
 const Students = sequelize.define(
     'students',
     {
@@ -75,15 +79,18 @@ const Students = sequelize.define(
     },
 );
 
-
+// Connect to postgres database
 async function connect(){
     await sequelize.authenticate();
     console.log("Connected to DB");
+
+    // Create "Students" table if not already created
     await Students.sync()
 
+    // Check if "Students" table empty or not
     const oldData = await Students.findAll();
-
     if(oldData.length === 0){
+        // Insert students data if table was empty
         studentsData.forEach( async (student) => {
             await Students.create(student)
         });
@@ -92,9 +99,10 @@ async function connect(){
 
 connect()
 
-
+// Delete all students route
 app.get("/deleteAllStudents", async(req,res)=>{
 
+    // Check if "Students" table empty or not
     const oldData = await Students.findAll();
 
     if(oldData.length === 0){
@@ -106,8 +114,10 @@ app.get("/deleteAllStudents", async(req,res)=>{
 
 })
 
-
+// Add all students route
 app.get("/addAllStudents" , async (req,res)=>{
+
+    // Check if "Students" table empty or not
     const oldData = await Students.findAll();
 
     if(oldData.length === 0){
@@ -120,8 +130,10 @@ app.get("/addAllStudents" , async (req,res)=>{
     }
 })
 
+// Get all students route
 app.get("/getAllStudents", async (req,res)=>{
 
+    // Check if "Students" table empty or not
     const oldData = await Students.findAll();
 
     if(oldData.length === 0){
@@ -132,7 +144,7 @@ app.get("/getAllStudents", async (req,res)=>{
     } 
 })
 
-
+// Make server listen to certain port
 app.listen(3000, ()=>{
     console.log("Server is running on port 3000");
 })
